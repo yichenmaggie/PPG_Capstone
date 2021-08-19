@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+
+<title>
+    PPG Capstone
+</title>
+
+<head>
+    <h1>Classification & Counterfactuals</h1>
+    <style>
+        table, th, td {
+          border: 1px solid black;
+        }
+        </style>
+</head>
+
+<body>
+
+    <h2>Introduction</h2>
+
+    <p>The application conducts a sensitivity check on a data point to see how to reverse the classification of that point by tweaking the features.<br>
+    For a data point that is originally classified as the good class, the feature tweaking will serve as a reminder that we don’t want that feature to change that much; <br>
+    and for a data point that is originally classified as the bad class, the feature tweaking will serve as an action item which we can use to make it good.
+    
+    <h2>Instructions</h2>
+
+    You need to upload a CSV file containing two rows, the first row is the feature names, the second row is the feature values (note that label should not be included).<br><br>
+
+    Next, you need to type in your preference of the numbers of steps you want the application to conduct the sensitivity check. Each step is a 5% change on the data.<br>
+    For example, if the feature is 5, and you set the number of steps to be 20, then the feature will be tweaked between [0, 10] to see how much tweaking is needed to reverse the classification.<br>
+    If the reversal fails in that range, we will tell you that it fails and you may want to change the number of steps you want to try.<br><br>
+
+    Lastly, you will need to enter the label names representing label 0 and label 1 respectively to document the result.<br>
+
+</p>
+    
+
+    <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+        <!-- Prompt the user to upload a csv file -->
+        <input type="file" name="fileupload" id="fileToUpload"><br><br>
+        <!-- Prompt the user to enter number of steps -->
+        <label for="num_of_steps">Number of Steps (between 1 and 15000):</label>
+        <input type="number" id="num_of_steps" value=20 name="num_of_steps" min="1" max="15000"><br><br>
+        <!-- Prompt the user to enter the names of the labels-->
+        <label for="name_0">The name of label 0:</label>
+        <input type="text" id="name_0" name="name_0"  value="non-churner"><br><br>
+        <label for="name_1">The name of label 1:</label>
+        <input type="text" id="name_1" name="name_1"  value="churner"><br><br>
+        <input type="submit" value="Submit" name="submit">
+    </form>
+
+    <br>
+
+    <!-- After the user has uploaded the file, display the features -->
+    {% if features %}
+    <h2>Most Important Features</h2>
+    <p>The percentages are relative feature importance determined by SHAP values. </p>
+    <p>They represent the relative impact of each feature in the local prediction given by the classification model.</p> 
+    <p>So if the feature importance is 50%, then this feature contributed to nearly half in changing the prediction probability compared to other features.</p>
+    <table>
+        <tr>
+        {% for feature in features %}
+            <th>{{feature}}</th>
+        <tr>
+            <td>{{features[feature]}}%</td>
+        </tr>
+        {% endfor %}
+      </tr>
+    </table>
+    {% endif %}
+    <br>
+
+
+    <!-- Display the classification result -->
+    {% if result %}
+    <h2>Result</h2>
+
+    <p>{{result}}</p>
+
+    {% endif %}
+
+
+</body>
+
+</html>
